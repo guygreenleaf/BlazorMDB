@@ -1,0 +1,72 @@
+﻿@page "/fetchdata"
+@using TestBlazor.Shared
+@using TestBlazor.Shared.Models;
+@using TestBlazor.Client.Services;
+@inject HttpClient Http
+@inject IProductsService productsService;
+
+<PageTitle>Products</PageTitle>
+
+<h1>Products</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (products == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+     <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>ZName</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in products)
+            {
+                <tr>
+                    <td>@product.Id</td>
+                    <td>@product.Name</td>
+                    <td>@product.Price</td>
+                    <td>@product.ZName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div style="display:flex; flex-direction:row; width:50px;">
+        <EditForm Model="@insertProduct" OnSubmit="NewProductInsert">
+            <InputText @bind-Value="insertProduct.Name">Name</InputText>
+            <InputText @bind-Value="insertProduct.ZName">ZName</InputText>
+            <InputNumber @bind-Value="insertProduct.Price">Price</InputNumber>
+            <button type="submit"> SUBMIT NEW </button>
+        </EditForm>
+    </div>
+
+}
+
+@code {
+    private List<ProductModel>? products;
+    private ProductInsertModel insertProduct { get; set; } = new ProductInsertModel();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await productsService.GetProductsAsync();
+    }
+
+    protected async Task NewProductInsert()
+    {
+        await productsService.InsertProductAsync(insertProduct);
+        insertProduct.Name = "";
+        insertProduct.ZName = "";
+        insertProduct.Price = 0;
+        products = await productsService.GetProductsAsync();
+        this.StateHasChanged();
+    }
+}
