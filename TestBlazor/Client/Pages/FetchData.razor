@@ -60,7 +60,7 @@ else
         products = await productsService.GetProductsAsync();
     }
 
-    protected async Task NewProductInsert()
+    private async Task NewProductInsert()
     {
         await productsService.InsertProductAsync(insertProduct);
         insertProduct.Name = "";
